@@ -13,7 +13,7 @@ const initialState = {
 
 const Register = () => {
   const [values, setValues] = useState(initialState);
-  const { isLoading, showAlert, displayAlert, clearAlert, registerUser, user } =
+  const { isLoading, showAlert, displayAlert, clearAlert, user, setupUser } =
     useAppContext();
   const navigate = useNavigate();
 
@@ -28,21 +28,21 @@ const Register = () => {
   const onSubmit = (e) => {
     e.preventDefault();
     const { name, email, password, isMember } = values;
+
     if (!email || !password || (!isMember && !name)) {
       displayAlert();
       return;
     }
+
     const currentUser = { name, email, password };
 
-    if (isMember) {
-      console.log('already member - login user');
-    } else {
-      try {
-        registerUser(currentUser);
-      } catch (error) {
-        console.log(error);
-      }
-    }
+    setupUser({
+      currentUser,
+      endpoint: isMember ? 'login' : 'register',
+      alertText: `${
+        isMember ? 'Login' : 'Registration'
+      } successful! Redirecting to dashboard...`,
+    });
 
     clearAlert();
   };

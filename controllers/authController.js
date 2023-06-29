@@ -1,8 +1,6 @@
 import User from '../models/User.js';
 import { StatusCodes } from 'http-status-codes';
-import { BadRequestError, UnauthorizedError } from '../errors/index.js';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import { BadRequestError, UnauthenticatedError } from '../errors/index.js';
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -35,17 +33,38 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
 
+  // If email or password isn't provided throw an error
   if (!email || !password) {
     throw new BadRequestError('Please provide all values');
   }
-  const user = await User.findOne({ email });
-  const passwordMatch = await bcrypt.compare(password, user.password);
 
-  if (!passwordMatch) {
-    throw new UnauthorizedError('Email and password do not match');
+  const user = await User.findOne({ email }).select('+password');
+
+  // If user doesn't exist throw an error
+  if (!user) {
+    throw new UnauthenticatedError(
+      'No account is registered with that email. Please try again.'
+    );
+  }
+  const passwordMatches = await user.comparePassword(password, user.password);
+
+  // If password isn't correct throw an error
+  if (!passwordMatches) {
+    throw new UnauthenticatedError(
+      'The email and password provided do not match our records. Please try again.'
+    );
   }
 
-  res.status(200).json({ message: 'Login successful' });
+  const token = user.createJWT();
+
+  // set password to null for payload to frontend
+  user.password = null;
+  // Return the user minus password and its jwt
+  res.status(StatusCodes.OK).json({
+    user,
+    location: user.location,
+    token,
+  });
 };
 
 const updateUser = async (req, res) => {

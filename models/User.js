@@ -40,11 +40,17 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
-// Sign and return a jwt with userID as payload
+// Provide a jwt with userID as payload
 UserSchema.methods.createJWT = function () {
   return jwt.sign({ userId: this._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_LIFETIME,
   });
+};
+
+// Compare provided password
+UserSchema.methods.comparePassword = async function (providedPW) {
+  const passwordMatch = bcrypt.compare(providedPW, this.password);
+  return passwordMatch;
 };
 
 UserSchema.pre('save', async function () {
