@@ -27,6 +27,7 @@ const initialState = {
 const AppContext = createContext();
 const AppProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
+
   const clearAlert = () => {
     setTimeout(() => {
       dispatch({ type: CLEAR_ALERT });
@@ -38,12 +39,24 @@ const AppProvider = ({ children }) => {
     clearAlert();
   };
 
+  /**
+   * Helper function to add an authenticated user to localStorage
+   * @param user - authenticated user object
+   * @param token - authenticated user JWT with userID
+   * @param location - authenticated user's location
+   */
   const addUserToLocalStorage = ({ user, token, location }) => {
     localStorage.setItem('user', JSON.stringify(user));
     localStorage.setItem('token', token);
     localStorage.setItem('location', location);
   };
 
+  /**
+   * Helper function to remove an authenticated user to localStorage
+   * @param user - authenticated user object
+   * @param token - authenticated user JWT with userID
+   * @param location - authenticated user's location
+   */
   const removeUserFromLocalStorage = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
