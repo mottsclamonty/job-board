@@ -54,9 +54,10 @@ UserSchema.methods.comparePassword = async function (providedPW) {
 };
 
 UserSchema.pre('save', async function () {
+  // Only hash password if field is being modified - Else don't bother to prevent error being thrown
+  if (!this.isModified('password')) return;
   const salt = await bcrypt.genSalt(10);
-  const hashedPW = await bcrypt.hash(this.password, salt);
-  this.password = hashedPW;
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
 export default mongoose.model('User', UserSchema);

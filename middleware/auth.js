@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken';
 const authMiddleware = async (req, res, next) => {
   // checking request header
   const authHeader = req.headers['authorization'];
-
   // Make sure authentication header exists and begins with Bearer
   if (!authHeader || !authHeader.startsWith('Bearer')) {
     throw new UnauthenticatedError('Authentication Invalid');
