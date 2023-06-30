@@ -1,6 +1,6 @@
 import { styled } from 'styled-components';
 
-const Wrapper = styled.main`
+const ErrorPageWrapper = styled.main`
   text-align: center;
   img {
     max-width: 600px;
@@ -25,4 +25,4 @@ const Wrapper = styled.main`
   }
 `;
 
-export default Wrapper;
+export default ErrorPageWrapper;

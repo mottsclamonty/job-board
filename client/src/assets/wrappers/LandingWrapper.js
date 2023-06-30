@@ -1,5 +1,5 @@
 import { styled } from 'styled-components';
-export const Wrapper = styled.main`
+const LandingWrapper = styled.main`
   nav {
     width: var(--fluid-width);
     max-width: var(--max-width);
@@ -39,3 +39,5 @@ export const Wrapper = styled.main`
     }
   }
 `;
+
+export default LandingWrapper;

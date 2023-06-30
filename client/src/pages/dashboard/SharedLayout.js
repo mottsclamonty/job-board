@@ -1,17 +1,21 @@
 import React from 'react';
 import SharedLayoutWrapper from '../../assets/wrappers/SharedLayoutWrapper';
-import { Link, Outlet } from 'react-router-dom';
-import DesktopSidebar from '../../components/DesktopSidebar';
-import Navbar from '../../components/Navbar';
-import MobileSidebar from '../../components/MobileSidebar';
+import { Outlet } from 'react-router-dom';
+import { DesktopSidebar, MobileSidebar, Navbar } from '../../components';
+
 const SharedLayout = () => {
   return (
     <SharedLayoutWrapper>
-      <nav>
-        <Link to="all-jobs">All jobs</Link>
-        <Link to="add-job">Add job</Link>
-      </nav>
-      <Outlet />
+      <main className="dashboard">
+        <MobileSidebar />
+        <DesktopSidebar />
+        <div>
+          <Navbar />
+          <div className="dashboard-page">
+            <Outlet />
+          </div>
+        </div>
+      </main>
     </SharedLayoutWrapper>
   );
 };
