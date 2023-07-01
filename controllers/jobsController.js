@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
 import { BadRequestError } from '../errors/index.js';
 import Job from '../models/Job.js';
-import User from '../models/User.js';
+
 const createJob = async (req, res) => {
   const { company, position } = req.body;
 
@@ -27,6 +27,9 @@ const updateJob = async (req, res) => {
 };
 
 const getAllJobs = async (req, res) => {
+  const allJobs = await Job.find();
+  console.log(req.user);
+  console.log(allJobs);
   res.send('all jobs');
 };
 

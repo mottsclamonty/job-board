@@ -12,6 +12,11 @@ import {
   UPDATE_USER_BEGIN,
   UPDATE_USER_SUCCESS,
   UPDATE_USER_ERROR,
+  HANDLE_CHANGE,
+  CLEAR_VALUES,
+  CREATE_JOB_BEGIN,
+  CREATE_JOB_SUCCESS,
+  CREATE_JOB_ERROR,
 } from './actions';
 
 const user = localStorage.getItem('user');
@@ -23,11 +28,19 @@ const initialState = {
   showAlert: false,
   alertText: '',
   alertType: '',
-  showSidebar: false,
   user: user ? JSON.parse(user) : null,
   token: token,
   userLocation: userLocation || '',
+  showSidebar: false,
+  isEditing: false,
+  editJobId: '',
   jobLocation: userLocation || '',
+  position: '',
+  company: '',
+  jobTypeOptions: ['full-time', 'part-time', 'remote', 'internship'],
+  jobType: 'full-time',
+  jobStatusOptions: ['pending', 'interview', 'declined'],
+  jobStatus: 'pending',
 };
 
 const AppContext = createContext();
@@ -164,6 +177,32 @@ const AppProvider = ({ children }) => {
     clearAlert();
   };
 
+  // Helper function for updating state values related to job
+  // I.E company, position, jobLocation, jobStatus, jobType
+  const handleChange = ({ name, value }) => {
+    dispatch({ type: HANDLE_CHANGE, payload: { name, value } });
+  };
+
+  const clearValues = () => {
+    dispatch({ type: CLEAR_VALUES });
+  };
+
+  const createJob = async (newJob) => {
+    dispatch({ type: CREATE_JOB_BEGIN });
+
+    try {
+      const res = await authInstance.post('/jobs/', newJob);
+      const { job } = res.data;
+      dispatch({ type: CREATE_JOB_SUCCESS, payload: { job } });
+    } catch (error) {
+      dispatch({
+        type: CREATE_JOB_ERROR,
+        payload: { msg: error.response.data.msg },
+      });
+    }
+
+    clearAlert();
+  };
   return (
     <AppContext.Provider
       value={{
@@ -174,6 +213,9 @@ const AppProvider = ({ children }) => {
         toggleSidebar,
         logoutUser,
         updateUser,
+        handleChange,
+        clearValues,
+        createJob,
       }}
     >
       {children}

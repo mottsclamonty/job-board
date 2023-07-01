@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FormRow, Alert } from '../../components';
 import { useAppContext } from '../../context/appContext';
-import ProfileWrapper from '../../assets/wrappers/ProfileWrapper';
+import DashboardFormWrapper from '../../assets/wrappers/DashboardFormWrapper';
 
 const Profile = () => {
   const { user, showAlert, displayAlert, updateUser, isLoading } =
@@ -22,7 +22,7 @@ const Profile = () => {
   };
 
   return (
-    <ProfileWrapper>
+    <DashboardFormWrapper>
       <form className="form" onSubmit={handleSubmit}>
         <h3>profile</h3>
         {showAlert && <Alert />}
@@ -59,7 +59,7 @@ const Profile = () => {
           </button>
         </div>
       </form>
-    </ProfileWrapper>
+    </DashboardFormWrapper>
   );
 };
 
