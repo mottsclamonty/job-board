@@ -27,10 +27,9 @@ const updateJob = async (req, res) => {
 };
 
 const getAllJobs = async (req, res) => {
-  const allJobs = await Job.find();
-  console.log(req.user);
-  console.log(allJobs);
-  res.send('all jobs');
+  console.log(req.user.userId);
+  const allJobs = await Job.find({ createdBy: req.user.userId });
+  res.send({ jobs: allJobs });
 };
 
 const getJob = async (req, res) => {
