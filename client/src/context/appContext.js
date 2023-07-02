@@ -17,6 +17,8 @@ import {
   CREATE_JOB_BEGIN,
   CREATE_JOB_SUCCESS,
   CREATE_JOB_ERROR,
+  GET_JOBS_BEGIN,
+  GET_JOBS_SUCCESS,
 } from './actions';
 
 const user = localStorage.getItem('user');
@@ -41,6 +43,10 @@ const initialState = {
   jobType: 'full-time',
   jobStatusOptions: ['pending', 'interview', 'declined'],
   jobStatus: 'pending',
+  jobs: [],
+  totalJobs: 0,
+  pageCount: 1,
+  page: 1,
 };
 
 const AppContext = createContext();
@@ -152,9 +158,8 @@ const AppProvider = ({ children }) => {
   };
 
   const updateUser = async (currentUser) => {
+    dispatch({ type: UPDATE_USER_BEGIN });
     try {
-      dispatch({ type: UPDATE_USER_BEGIN });
-
       const res = await authInstance.patch('/auth/updateUser', currentUser);
       const { user, location, token } = res.data;
 
@@ -173,6 +178,23 @@ const AppProvider = ({ children }) => {
         type: UPDATE_USER_ERROR,
         payload: { msg: error.response.data.msg },
       });
+    }
+    clearAlert();
+  };
+
+  const getJobs = async () => {
+    let url = `/jobs`;
+    dispatch({ type: GET_JOBS_BEGIN });
+    try {
+      const res = await authInstance.get(url);
+      const { jobs, totalJobs, pageCount } = res.data;
+
+      dispatch({
+        type: GET_JOBS_SUCCESS,
+        payload: { jobs, totalJobs, pageCount },
+      });
+    } catch (error) {
+      logoutUser();
     }
     clearAlert();
   };
@@ -203,6 +225,13 @@ const AppProvider = ({ children }) => {
 
     clearAlert();
   };
+
+  const setEditJob = (id) => {
+    console.log(`Set edit job : ${id}`);
+  };
+  const deleteJob = (id) => {
+    console.log(`deleting job : ${id}`);
+  };
   return (
     <AppContext.Provider
       value={{
@@ -216,6 +245,9 @@ const AppProvider = ({ children }) => {
         handleChange,
         clearValues,
         createJob,
+        getJobs,
+        setEditJob,
+        deleteJob,
       }}
     >
       {children}
