@@ -19,6 +19,11 @@ import {
   CREATE_JOB_ERROR,
   GET_JOBS_BEGIN,
   GET_JOBS_SUCCESS,
+  SET_EDIT_JOB,
+  UPDATE_JOB_BEGIN,
+  UPDATE_JOB_SUCCESS,
+  DELETE_JOB_BEGIN,
+  UPDATE_JOB_ERROR,
 } from './actions';
 
 const user = localStorage.getItem('user');
@@ -227,11 +232,53 @@ const AppProvider = ({ children }) => {
   };
 
   const setEditJob = (id) => {
-    console.log(`Set edit job : ${id}`);
+    dispatch({ type: SET_EDIT_JOB, payload: { id } });
   };
-  const deleteJob = (id) => {
-    console.log(`deleting job : ${id}`);
+
+  const editJob = async () => {
+    dispatch({ type: UPDATE_JOB_BEGIN });
+
+    try {
+      const { company, position, jobLocation, jobType, jobStatus, editJobId } =
+        state;
+      console.log({
+        company,
+        position,
+        jobLocation,
+        jobType,
+        jobStatus,
+        editJobId,
+      });
+      await authInstance.patch(`/jobs/${state.editJobId}`, {
+        company,
+        position,
+        jobLocation,
+        jobType,
+        jobStatus,
+      });
+      dispatch({ type: UPDATE_JOB_SUCCESS });
+      clearValues();
+    } catch (error) {
+      if (error.response.status === 401) return;
+      dispatch({
+        type: UPDATE_JOB_ERROR,
+        payload: { msg: error.response.data.msg },
+      });
+    }
+
+    clearAlert();
   };
+
+  const deleteJob = async (jobId) => {
+    dispatch({ type: DELETE_JOB_BEGIN });
+    try {
+      await authInstance.delete(`/jobs/${jobId}`);
+      getJobs();
+    } catch (error) {
+      logoutUser();
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -247,6 +294,7 @@ const AppProvider = ({ children }) => {
         createJob,
         getJobs,
         setEditJob,
+        editJob,
         deleteJob,
       }}
     >

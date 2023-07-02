@@ -17,7 +17,6 @@ const Job = ({
   const { setEditJob, deleteJob } = useAppContext();
   let date = moment(createdAt);
   date = date.format('MMM Do, YYYY');
-
   return (
     <SingleJobWrapper>
       <header>
