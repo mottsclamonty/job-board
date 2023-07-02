@@ -6,6 +6,7 @@ import {
 } from '../errors/index.js';
 import Job from '../models/Job.js';
 import checkPermissions from '../utils/checkPermissions.js';
+import mongoose from 'mongoose';
 
 const createJob = async (req, res) => {
   const { company, position } = req.body;
@@ -82,7 +83,24 @@ const getJob = async (req, res) => {
 };
 
 const showStats = async (req, res) => {
-  res.send('showing job stats');
+  let stats = await Job.aggregate([
+    { $match: { createdBy: new mongoose.Types.ObjectId(req.user.userId) } },
+    { $group: { _id: '$jobStatus', count: { $sum: 1 } } },
+  ]);
+
+  stats = stats.reduce((accumulator, stat) => {
+    const { _id: title, count } = stat;
+    accumulator[title] = count || 0;
+    return accumulator;
+  }, {});
+
+  const defaultStats = {
+    pending: stats.pending || 0,
+    declined: stats.declined || 0,
+    interview: stats.interview || 0,
+  };
+  let monthlyApplications = [];
+  res.status(StatusCodes.OK).json({ stats: defaultStats, monthlyApplications });
 };
 
 export { createJob, deleteJob, updateJob, getAllJobs, getJob, showStats };
