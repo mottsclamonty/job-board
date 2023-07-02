@@ -21,6 +21,8 @@ import {
   UPDATE_JOB_BEGIN,
   UPDATE_JOB_SUCCESS,
   UPDATE_JOB_ERROR,
+  SHOW_STATS_BEGIN,
+  SHOW_STATS_SUCCESS,
 } from './actions';
 import { initialState } from './appContext';
 
@@ -240,7 +242,21 @@ export const reducer = (state, action) => {
       alertText: action.payload.msg,
     };
   }
-
+  if (action.type === SHOW_STATS_BEGIN) {
+    return {
+      ...state,
+      isLoading: true,
+      showAlert: false,
+    };
+  }
+  if (action.type === SHOW_STATS_SUCCESS) {
+    return {
+      ...state,
+      isLoading: false,
+      stats: action.payload.stats,
+      monthlyApplications: action.payload.monthlyApplications,
+    };
+  }
   // if action doesn't match any handled actions in reducer
   throw new Error(`no such action: ${action.type}`);
 };

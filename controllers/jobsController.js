@@ -70,7 +70,6 @@ const updateJob = async (req, res) => {
 };
 
 const getAllJobs = async (req, res) => {
-  console.log(req.user.userId);
   const allJobs = await Job.find({ createdBy: req.user.userId });
   res
     .status(StatusCodes.OK)

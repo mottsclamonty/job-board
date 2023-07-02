@@ -24,6 +24,8 @@ import {
   UPDATE_JOB_SUCCESS,
   DELETE_JOB_BEGIN,
   UPDATE_JOB_ERROR,
+  SHOW_STATS_BEGIN,
+  SHOW_STATS_SUCCESS,
 } from './actions';
 
 const user = localStorage.getItem('user');
@@ -49,6 +51,8 @@ const initialState = {
   jobStatusOptions: ['pending', 'interview', 'declined'],
   jobStatus: 'pending',
   jobs: [],
+  stats: {},
+  monthlyApplications: [],
   totalJobs: 0,
   pageCount: 1,
   page: 1,
@@ -239,16 +243,7 @@ const AppProvider = ({ children }) => {
     dispatch({ type: UPDATE_JOB_BEGIN });
 
     try {
-      const { company, position, jobLocation, jobType, jobStatus, editJobId } =
-        state;
-      console.log({
-        company,
-        position,
-        jobLocation,
-        jobType,
-        jobStatus,
-        editJobId,
-      });
+      const { company, position, jobLocation, jobType, jobStatus } = state;
       await authInstance.patch(`/jobs/${state.editJobId}`, {
         company,
         position,
@@ -279,6 +274,24 @@ const AppProvider = ({ children }) => {
     }
   };
 
+  const showStats = async () => {
+    dispatch({ type: SHOW_STATS_BEGIN });
+
+    try {
+      const { data } = await authInstance.get('/jobs/stats');
+      dispatch({
+        type: SHOW_STATS_SUCCESS,
+        payload: {
+          stats: data.stats,
+          monthlyApplications: data.monthlyApplications,
+        },
+      });
+    } catch (error) {
+      logoutUser();
+    }
+    clearAlert();
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -296,6 +309,7 @@ const AppProvider = ({ children }) => {
         setEditJob,
         editJob,
         deleteJob,
+        showStats,
       }}
     >
       {children}
