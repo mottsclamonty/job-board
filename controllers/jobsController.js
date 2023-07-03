@@ -71,7 +71,41 @@ const updateJob = async (req, res) => {
 };
 
 const getAllJobs = async (req, res) => {
-  const allJobs = await Job.find({ createdBy: req.user.userId });
+  const { search, jobStatus, jobType, sort } = req.query;
+
+  const queryObject = {
+    createdBy: req.user.userId,
+  };
+
+  if (jobStatus && jobStatus !== 'all') {
+    queryObject.jobStatus = jobStatus;
+  }
+  if (jobType && jobType !== 'all') {
+    queryObject.jobType = jobType;
+  }
+  // find jobs with positions matching case insensitive search regex
+  if (search) {
+    queryObject.position = { $regex: search, $options: 'i' };
+  }
+
+  let query = Job.find(queryObject);
+
+  // Different sort options
+  if (sort === 'latest') {
+    query = query.sort('-createdAt');
+  }
+  if (sort === 'oldest') {
+    query = query.sort('createdAt');
+  }
+  if (sort === 'a-z') {
+    query = query.sort('position');
+  }
+  if (sort === 'z-a') {
+    query = query.sort('-position');
+  }
+
+  const allJobs = await query;
+
   res
     .status(StatusCodes.OK)
     .json({ jobs: allJobs, totalJobs: allJobs.length, pageCount: 1 });

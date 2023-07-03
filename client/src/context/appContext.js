@@ -26,6 +26,7 @@ import {
   UPDATE_JOB_ERROR,
   SHOW_STATS_BEGIN,
   SHOW_STATS_SUCCESS,
+  CLEAR_FILTERS,
 } from './actions';
 
 const user = localStorage.getItem('user');
@@ -56,6 +57,11 @@ const initialState = {
   totalJobs: 0,
   pageCount: 1,
   page: 1,
+  search: '',
+  searchStatus: '',
+  searchType: '',
+  sort: '',
+  sortOptions: ['latest', 'oldest', 'a-z', 'z-a'],
 };
 
 const AppContext = createContext();
@@ -192,7 +198,13 @@ const AppProvider = ({ children }) => {
   };
 
   const getJobs = async () => {
-    let url = `/jobs`;
+    const { search, searchStatus, searchType, sort } = state;
+    let url = `/jobs/?jobStatus=${searchStatus}&jobType=${searchType}&sort=${sort}`;
+
+    // search can be empty so leave as optional
+    if (search) {
+      url = url + `&search=${search}`;
+    }
     dispatch({ type: GET_JOBS_BEGIN });
     try {
       const res = await authInstance.get(url);
@@ -292,6 +304,10 @@ const AppProvider = ({ children }) => {
     clearAlert();
   };
 
+  const clearFilters = () => {
+    dispatch({ type: CLEAR_FILTERS });
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -310,6 +326,7 @@ const AppProvider = ({ children }) => {
         editJob,
         deleteJob,
         showStats,
+        clearFilters,
       }}
     >
       {children}
