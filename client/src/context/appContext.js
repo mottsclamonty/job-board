@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer } from 'react';
+import { createContext, useContext, useEffect, useReducer } from 'react';
 import { reducer } from './reducer';
 import axios from 'axios';
 import {
@@ -28,24 +28,22 @@ import {
   SHOW_STATS_SUCCESS,
   CLEAR_FILTERS,
   CHANGE_PAGE,
+  GET_CURRENT_USER_BEGIN,
+  GET_CURRENT_USER_SUCCESS,
 } from './actions';
 
-const user = localStorage.getItem('user');
-const token = localStorage.getItem('token');
-const userLocation = localStorage.getItem('location');
-
 const initialState = {
+  userLoading: true,
   isLoading: false,
   showAlert: false,
   alertText: '',
   alertType: '',
-  user: user ? JSON.parse(user) : null,
-  token: token,
-  userLocation: userLocation || '',
+  user: null,
+  userLocation: '',
   showSidebar: false,
   isEditing: false,
   editJobId: '',
-  jobLocation: userLocation || '',
+  jobLocation: '',
   position: '',
   company: '',
   jobTypeOptions: ['full-time', 'part-time', 'remote', 'internship'],
@@ -76,19 +74,7 @@ const AppProvider = ({ children }) => {
     baseURL: '/api/v1',
   });
 
-  // Request interceptor to set authorization header with jwt
-  authInstance.interceptors.request.use(
-    (config) => {
-      // set the authorization header before request is sent
-      config.headers['Authorization'] = `Bearer ${state.token}`;
-      return config;
-    },
-    (error) => {
-      return Promise.reject(error);
-    }
-  );
-
-  // Response interceptor
+  // Response interceptor - logout user if unauthorized
   authInstance.interceptors.response.use(
     (res) => {
       return res;
@@ -112,28 +98,8 @@ const AppProvider = ({ children }) => {
     clearAlert();
   };
 
-  /**
-   * Helper function to add an authenticated user to localStorage
-   * @param user - authenticated user object
-   * @param token - authenticated user JWT with userID
-   * @param location - authenticated user's location
-   */
-  const addUserToLocalStorage = ({ user, token, location }) => {
-    localStorage.setItem('user', JSON.stringify(user));
-    localStorage.setItem('token', token);
-    localStorage.setItem('location', location);
-  };
-
-  /**
-   * Helper function to remove an authenticated user to localStorage
-   * @param user - authenticated user object
-   * @param token - authenticated user JWT with userID
-   * @param location - authenticated user's location
-   */
-  const removeUserFromLocalStorage = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    localStorage.removeItem('location');
+  const toggleSidebar = () => {
+    dispatch({ type: TOGGLE_SIDEBAR });
   };
 
   /**
@@ -148,13 +114,11 @@ const AppProvider = ({ children }) => {
 
       const res = await axios.post(`/api/v1/auth/${endpoint}`, currentUser);
 
-      const { user, location, token } = res.data;
-
-      addUserToLocalStorage({ user, token, location });
+      const { user, location } = res.data;
 
       dispatch({
         type: SETUP_USER_SUCCESS,
-        payload: { user, location, token, alertText },
+        payload: { user, location, alertText },
       });
     } catch (error) {
       dispatch({
@@ -166,12 +130,22 @@ const AppProvider = ({ children }) => {
     clearAlert();
   };
 
-  const toggleSidebar = () => {
-    dispatch({ type: TOGGLE_SIDEBAR });
+  const getCurrentUser = async () => {
+    dispatch({ type: GET_CURRENT_USER_BEGIN });
+
+    try {
+      const res = await authInstance.get('/auth/getCurrentUser');
+      const { user, location } = res.data;
+
+      dispatch({ type: GET_CURRENT_USER_SUCCESS, payload: { user, location } });
+    } catch (error) {
+      if (error.response.status === 401) return;
+      logoutUser();
+    }
   };
 
-  const logoutUser = () => {
-    removeUserFromLocalStorage();
+  const logoutUser = async () => {
+    await authInstance.get('/auth/logoutCurrentUser');
     dispatch({ type: LOGOUT_USER });
   };
 
@@ -179,15 +153,12 @@ const AppProvider = ({ children }) => {
     dispatch({ type: UPDATE_USER_BEGIN });
     try {
       const res = await authInstance.patch('/auth/updateUser', currentUser);
-      const { user, location, token } = res.data;
-
-      addUserToLocalStorage({ user, token, location });
+      const { user, location } = res.data;
 
       dispatch({
         type: UPDATE_USER_SUCCESS,
         payload: {
           user,
-          token,
           location,
         },
       });
@@ -314,14 +285,19 @@ const AppProvider = ({ children }) => {
   const changePage = (page) => {
     dispatch({ type: CHANGE_PAGE, payload: { page } });
   };
+
+  useEffect(() => {
+    getCurrentUser();
+  }, []);
+
   return (
     <AppContext.Provider
       value={{
         ...state,
         displayAlert,
         clearAlert,
-        setupUser,
         toggleSidebar,
+        setupUser,
         logoutUser,
         updateUser,
         handleChange,

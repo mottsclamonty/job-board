@@ -1,6 +1,7 @@
 import User from '../models/User.js';
 import { StatusCodes } from 'http-status-codes';
 import { BadRequestError, UnauthenticatedError } from '../errors/index.js';
+import attachCookie from '../utils/attachCookie.js';
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -17,6 +18,9 @@ const register = async (req, res) => {
   // jwt token containing userID
   const token = user.createJWT();
 
+  // storing jwt in cookie
+  attachCookie({ res, token });
+
   res.status(StatusCodes.CREATED).json({
     user: {
       email: user.email,
@@ -26,7 +30,6 @@ const register = async (req, res) => {
     },
 
     location: user.location,
-    token,
   });
 };
 
@@ -59,11 +62,14 @@ const login = async (req, res) => {
 
   // set password to null for payload to frontend
   user.password = null;
+
+  // storing jwt in cookie
+  attachCookie({ res, token });
+
   // Return the user minus password and its jwt
   res.status(StatusCodes.OK).json({
     user,
     location: user.location,
-    token,
   });
 };
 
@@ -84,7 +90,20 @@ const updateUser = async (req, res) => {
 
   const token = user.createJWT();
 
-  res.status(StatusCodes.OK).json({ user, token, location: user.location });
+  // storing jwt in cookie
+  attachCookie({ res, token });
+
+  res.status(StatusCodes.OK).json({ user, location: user.location });
 };
 
-export { register, login, updateUser };
+const getCurrentUser = async (req, res) => {
+  const user = await User.findOne({ _id: req.user.userId });
+  res.status(StatusCodes.OK).json({ user, location: user.location });
+};
+
+const logoutCurrentUser = async (req, res) => {
+  res.clearCookie('token');
+  res.status(StatusCodes.OK).end();
+};
+
+export { register, login, updateUser, getCurrentUser, logoutCurrentUser };

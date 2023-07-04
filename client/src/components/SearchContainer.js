@@ -28,7 +28,6 @@ const SearchContainer = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log({ search, searchStatus, searchType, sort });
     setTypingSearch('');
     clearFilters();
   };

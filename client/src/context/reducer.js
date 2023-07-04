@@ -25,7 +25,10 @@ import {
   SHOW_STATS_SUCCESS,
   CLEAR_FILTERS,
   CHANGE_PAGE,
+  GET_CURRENT_USER_BEGIN,
+  GET_CURRENT_USER_SUCCESS,
 } from './actions';
+
 import { initialState } from './appContext';
 
 export const reducer = (state, action) => {
@@ -45,6 +48,12 @@ export const reducer = (state, action) => {
       alertText: '',
     };
   }
+  if (action.type === TOGGLE_SIDEBAR) {
+    return {
+      ...state,
+      showSidebar: !state.showSidebar,
+    };
+  }
   if (action.type === SETUP_USER_BEGIN) {
     return {
       ...state,
@@ -59,7 +68,6 @@ export const reducer = (state, action) => {
       alertType: 'success',
       alertText: action.payload.alertText,
       user: action.payload.user,
-      token: action.payload.token,
       userLocation: action.payload.location,
       jobLocation: action.payload.location,
     };
@@ -72,24 +80,33 @@ export const reducer = (state, action) => {
       alertType: 'danger',
       alertText: action.payload.msg,
       user: null,
-      token: null,
       userLocation: '',
       jobLocation: '',
     };
   }
-  if (action.type === TOGGLE_SIDEBAR) {
+  if (action.type === GET_CURRENT_USER_BEGIN) {
     return {
       ...state,
-      showSidebar: !state.showSidebar,
+      userLoading: true,
+      showAlert: false,
+    };
+  }
+  if (action.type === GET_CURRENT_USER_SUCCESS) {
+    return {
+      ...state,
+      userLoading: false,
+      user: action.payload.user,
+      userLocation: action.payload.location,
+      jobLocation: action.payload.location,
     };
   }
   if (action.type === LOGOUT_USER) {
     return {
       ...initialState,
       user: null,
-      token: null,
       userLocation: null,
       jobLocation: null,
+      userLoading: false,
     };
   }
   if (action.type === UPDATE_USER_BEGIN) {
@@ -106,7 +123,6 @@ export const reducer = (state, action) => {
       alertType: 'success',
       alertText: 'User information updated successfully!',
       user: action.payload.user,
-      token: action.payload.token,
       userLocation: action.payload.location,
       jobLocation: action.payload.location,
     };
