@@ -11,7 +11,7 @@ const start = async () => {
     await Job.deleteMany();
 
     const jsonJobs = JSON.parse(
-      await readFile(new URL('./mock-data.json', import.meta.url))
+      await readFile(new URL('./test-user-jobs.json', import.meta.url))
     );
 
     await Job.create(jsonJobs);

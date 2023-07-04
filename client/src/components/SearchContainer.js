@@ -1,7 +1,9 @@
-import React from 'react';
+import { useState, useCallback } from 'react';
 import SearchContainerWrapper from '../assets/wrappers/SearchContainerWrapper';
 import { FormRow, FormRowSelect } from '.';
 import { useAppContext } from '../context/appContext';
+import debounce from 'lodash.debounce';
+
 const SearchContainer = () => {
   const {
     isLoading,
@@ -18,16 +20,26 @@ const SearchContainer = () => {
     clearFilters,
   } = useAppContext();
 
+  const [typingSearch, setTypingSearch] = useState('');
+
   const handleSearch = (e) => {
-    if (isLoading) return;
     handleChange({ name: e.target.name, value: e.target.value });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log({ search, searchStatus, searchType, sort });
+    setTypingSearch('');
     clearFilters();
   };
+
+  const debouncedHandleSearch = useCallback(
+    debounce((e) => {
+      setTypingSearch(e.target.value);
+      handleChange({ name: e.target.name, value: e.target.value });
+    }, 350),
+    []
+  );
 
   return (
     <SearchContainerWrapper>
@@ -37,8 +49,11 @@ const SearchContainer = () => {
           <FormRow
             type="text"
             name="search"
-            value={search}
-            handleChange={handleSearch}
+            value={typingSearch}
+            handleChange={(e) => {
+              setTypingSearch(e.target.value);
+              debouncedHandleSearch(e);
+            }}
           />
           <FormRowSelect
             type="text"

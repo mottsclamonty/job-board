@@ -41,9 +41,15 @@ const DashboardFormWrapper = styled.section`
   }
   .clear-btn {
     background: var(--grey-500);
+    &:disabled {
+      background: var(--grey-300);
+    }
   }
   .clear-btn:hover {
     background: var(--black);
+    &:disabled {
+      background: var(--grey-300);
+    }
   }
   @media (min-width: 992px) {
     .form-center {

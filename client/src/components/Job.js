@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import moment from 'moment';
 import { FaLocationArrow, FaBriefcase, FaCalendarAlt } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
@@ -14,9 +14,14 @@ const Job = ({
   createdAt,
   jobStatus,
 }) => {
-  const { setEditJob, deleteJob } = useAppContext();
+  const { setEditJob, deleteJob, user } = useAppContext();
   let date = moment(createdAt);
   date = date.format('MMM Do, YYYY');
+
+  const disableLink = useMemo(() => {
+    return user?.email === 'test@example.com';
+  }, [user]);
+
   return (
     <SingleJobWrapper>
       <header>
@@ -38,13 +43,17 @@ const Job = ({
             <Link
               to="/add-job"
               onClick={() => setEditJob(_id)}
-              className="btn edit-btn"
+              className={`btn edit-btn ${
+                disableLink ? 'edit-btn-disabled' : ''
+              }`}
             >
               Edit
             </Link>
             <button
               type="button"
-              className="btn delete-btn"
+              className={`btn delete-btn ${
+                disableLink ? 'delete-btn-disabled' : ''
+              }`}
               onClick={() => deleteJob(_id)}
             >
               Delete

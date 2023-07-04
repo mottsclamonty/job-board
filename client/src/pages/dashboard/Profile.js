@@ -34,6 +34,7 @@ const Profile = () => {
             name="name"
             handleChange={(e) => setName(e.target.value)}
             value={name}
+            disabled={email === 'test@example.com'}
           />
           <FormRow
             type="text"
@@ -41,20 +42,27 @@ const Profile = () => {
             name="lastName"
             handleChange={(e) => setLastName(e.target.value)}
             value={lastName}
+            disabled={email === 'test@example.com'}
           />
           <FormRow
             type="email"
             name="email"
             handleChange={(e) => setEmail(e.target.value)}
             value={email}
+            disabled={email === 'test@example.com'}
           />
           <FormRow
             type="text"
             name="location"
             handleChange={(e) => setLocation(e.target.value)}
             value={location}
+            disabled={email === 'test@example.com'}
           />
-          <button type="submit" className="btn btn-block" disabled={isLoading}>
+          <button
+            type="submit"
+            className="btn btn-block"
+            disabled={isLoading || email === 'test@example.com'}
+          >
             {isLoading ? 'Please wait...' : 'save changes'}
           </button>
         </div>

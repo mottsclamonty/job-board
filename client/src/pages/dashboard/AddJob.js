@@ -7,6 +7,7 @@ const AddJob = () => {
     isLoading,
     showAlert,
     displayAlert,
+    user,
     isEditing,
     position,
     company,
@@ -58,6 +59,7 @@ const AddJob = () => {
             name="position"
             value={position}
             handleChange={handleJobInput}
+            disabled={user?.email === 'test@example.com'}
           />
 
           {/* company */}
@@ -66,6 +68,7 @@ const AddJob = () => {
             name="company"
             value={company}
             handleChange={handleJobInput}
+            disabled={user?.email === 'test@example.com'}
           />
 
           {/* location */}
@@ -75,6 +78,7 @@ const AddJob = () => {
             name="jobLocation"
             value={jobLocation}
             handleChange={handleJobInput}
+            disabled={user?.email === 'test@example.com'}
           />
 
           {/* status */}
@@ -84,6 +88,7 @@ const AddJob = () => {
             value={jobStatus}
             handleChange={handleJobInput}
             options={jobStatusOptions}
+            disabled={user?.email === 'test@example.com'}
           />
 
           {/* type */}
@@ -93,6 +98,7 @@ const AddJob = () => {
             value={jobType}
             handleChange={handleJobInput}
             options={jobTypeOptions}
+            disabled={user?.email === 'test@example.com'}
           />
 
           <div className="btn-container">
@@ -100,7 +106,7 @@ const AddJob = () => {
               type="submit"
               className="btn btn-block submit-btn"
               onClick={handleSubmit}
-              disabled={isLoading}
+              disabled={isLoading || user?.email === 'test@example.com'}
             >
               submit
             </button>
@@ -111,6 +117,7 @@ const AddJob = () => {
                 e.preventDefault();
                 clearValues();
               }}
+              disabled={user?.email === 'test@example.com'}
             >
               clear
             </button>

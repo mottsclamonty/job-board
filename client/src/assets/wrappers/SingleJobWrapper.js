@@ -92,10 +92,20 @@ const SingleJobWrapper = styled.article`
     color: var(--green-dark);
     background: var(--green-light);
     margin-right: 0.5rem;
+    &-disabled {
+      background-color: var(--grey-100);
+      color: var(--grey-400);
+      pointer-events: none;
+    }
   }
   .delete-btn {
     color: var(--red-dark);
     background: var(--red-light);
+    &-disabled {
+      background-color: var(--grey-100);
+      color: var(--grey-400);
+      pointer-events: none;
+    }
   }
   &:hover .actions {
     visibility: visible;

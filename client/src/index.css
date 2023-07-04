@@ -157,15 +157,22 @@ ul {
   text-transform: capitalize;
   display: inline-block;
 }
+.btn:disabled {
+  background: var(--primary-300);
+}
 .btn:hover {
   background: var(--primary-700);
   box-shadow: var(--shadow-3);
 }
-.btn-hipster {
+.btn:hover:disabled {
+  background: var(--primary-300);
+  box-shadow: var(--shadow-2);
+}
+.btn-alt {
   color: var(--primary-500);
   background: var(--primary-200);
 }
-.btn-hipster:hover {
+.btn-alt:hover {
   color: var(--primary-200);
   background: var(--primary-700);
 }

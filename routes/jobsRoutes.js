@@ -10,8 +10,13 @@ import {
   showStats,
 } from '../controllers/jobsController.js';
 
-jobsRouter.route('/').post(createJob).get(getAllJobs);
+import checkTestUser from '../middleware/checkTestUser.js';
+
+jobsRouter.route('/').post(checkTestUser, createJob).get(getAllJobs);
 jobsRouter.route('/stats').get(showStats);
-jobsRouter.route('/:id').delete(deleteJob).patch(updateJob).get(getJob);
+jobsRouter
+  .route('/:id')
+  .delete(checkTestUser, deleteJob)
+  .patch(checkTestUser, updateJob);
 
 export default jobsRouter;
