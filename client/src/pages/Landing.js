@@ -17,13 +17,14 @@ const Landing = () => {
         <div className="container page">
           <div className="info">
             <h1>
-              job <span>tracking</span> app
+              job <span>tracker</span>
             </h1>
             <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Explicabo
-              recusandae omnis, molestias quidem, reiciendis illum inventore
-              excepturi atque minus illo velit ab perspiciatis nostrum vitae
-              quod numquam distinctio iure quo.
+              On the hunt for a new job? Simplify your life by tracking all of
+              your applications in one place. Add new applications with a smooth
+              and easy-to-use interface, search and filter all of your tracked
+              applications, and quickly visualize your successes and monthly
+              application rates.
             </p>
             <Link to="/register" className="btn btn-hero">
               Login/Register
