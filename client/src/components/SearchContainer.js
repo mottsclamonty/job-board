@@ -7,7 +7,6 @@ import debounce from 'lodash.debounce';
 const SearchContainer = () => {
   const {
     isLoading,
-    search,
     searchStatus,
     searchType,
     searchLimit,
@@ -32,6 +31,7 @@ const SearchContainer = () => {
     clearFilters();
   };
 
+  // eslint-disable-next-line
   const debouncedHandleSearch = useCallback(
     debounce((e) => {
       setTypingSearch(e.target.value);
