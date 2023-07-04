@@ -8,6 +8,8 @@ const SearchContainer = () => {
     search,
     searchStatus,
     searchType,
+    searchLimit,
+    searchLimitOptions,
     sort,
     sortOptions,
     jobStatusOptions,
@@ -59,6 +61,14 @@ const SearchContainer = () => {
             name="sort"
             options={sortOptions}
             value={sort}
+            handleChange={handleSearch}
+          />
+          <FormRowSelect
+            type="text"
+            name="searchLimit"
+            labelText="Results per page"
+            options={searchLimitOptions}
+            value={searchLimit}
             handleChange={handleSearch}
           />
           <button

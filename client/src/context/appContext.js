@@ -27,6 +27,7 @@ import {
   SHOW_STATS_BEGIN,
   SHOW_STATS_SUCCESS,
   CLEAR_FILTERS,
+  CHANGE_PAGE,
 } from './actions';
 
 const user = localStorage.getItem('user');
@@ -62,6 +63,8 @@ const initialState = {
   searchType: '',
   sort: '',
   sortOptions: ['latest', 'oldest', 'a-z', 'z-a'],
+  searchLimit: 10,
+  searchLimitOptions: [10, 20, 50, 100],
 };
 
 const AppContext = createContext();
@@ -198,8 +201,8 @@ const AppProvider = ({ children }) => {
   };
 
   const getJobs = async () => {
-    const { search, searchStatus, searchType, sort } = state;
-    let url = `/jobs/?jobStatus=${searchStatus}&jobType=${searchType}&sort=${sort}`;
+    const { search, searchStatus, searchType, sort, searchLimit, page } = state;
+    let url = `/jobs/?jobStatus=${searchStatus}&jobType=${searchType}&sort=${sort}&limit=${searchLimit}&page=${page}`;
 
     // search can be empty so leave as optional
     if (search) {
@@ -308,6 +311,9 @@ const AppProvider = ({ children }) => {
     dispatch({ type: CLEAR_FILTERS });
   };
 
+  const changePage = (page) => {
+    dispatch({ type: CHANGE_PAGE, payload: { page } });
+  };
   return (
     <AppContext.Provider
       value={{
@@ -327,6 +333,7 @@ const AppProvider = ({ children }) => {
         deleteJob,
         showStats,
         clearFilters,
+        changePage,
       }}
     >
       {children}

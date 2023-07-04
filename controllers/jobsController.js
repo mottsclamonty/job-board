@@ -104,11 +104,21 @@ const getAllJobs = async (req, res) => {
     query = query.sort('-position');
   }
 
+  // pagination
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  query = query.skip(skip).limit(limit);
+
+  // awaiting modified query promise
   const allJobs = await query;
 
-  res
-    .status(StatusCodes.OK)
-    .json({ jobs: allJobs, totalJobs: allJobs.length, pageCount: 1 });
+  // total number of jobs and number of pages
+  const totalJobs = await Job.countDocuments(queryObject);
+  const pageCount = Math.ceil(totalJobs / limit);
+
+  res.status(StatusCodes.OK).json({ jobs: allJobs, totalJobs, pageCount });
 };
 
 const getJob = async (req, res) => {
